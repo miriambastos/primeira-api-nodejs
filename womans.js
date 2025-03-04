@@ -55,12 +55,49 @@ function criarMulher(request, response)
     response.json(mulheres)
 }
 
+//PATCH
+function corrigeMulher(request, response)
+{
+    function encontraMulher(mulher)
+    {
+        if (mulher.id === request.params.id) //encontrar id igual ao que sera informado na requisição
+        {
+            return mulher
+        }
+    }
+
+    const mulherEncontrada = mulheres.find(encontraMulher)
+
+    if (request.body.nome)
+    {
+        mulherEncontrada.nome = request.body.nome
+    }
+
+    if (request.body.minibio)
+    {
+        mulherEncontrada.minibio = request.body.minibio
+    }
+
+    if (request.body.imagem)
+    {
+            mulherEncontrada = request.body.imagem
+    }
+
+
+    response.json(mulheres)
+}
+
+
 //PORTA
 function mostrarPorta ()
 {
     console.log("Servidor criado e rodando na porta ", porta)
 }
 
-app.use(router.get('/womans', mostrarMulheres)) //configurei rota get womans
-app.use(router.post('/womans', criarMulher )) //configurei rota post womans
+app.use(router.get('/womans', mostrarMulheres)) 
+
+app.use(router.post('/womans', criarMulher )) 
+
+app.use(router.patch('/womans/:id', corrigeMulher )) 
+
 app.listen(porta, mostrarPorta)
