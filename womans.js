@@ -4,6 +4,9 @@ const router = express.Router()
 //nmp UUID para gerar ID automatico
 const { v4: uuidv4 } = require('uuid');
 
+const conectaBancoDeDados = require('./bancoDeDados') //ligando ao arquivo BD
+conectaBancoDeDados()
+
 const app = express()
 app.use(express.json()) //tratando as requisições e os dados que vao trafegar estarão em json
 const porta = 3333
@@ -25,7 +28,7 @@ const mulheres =
         minibio: 'Product Owner'
     },
     {
-        id: '4',
+        id: '3',
         nome: 'Poli Piva',
         imagem: 'https://www.linkedin.com/in/poliana-piva/overlay/photo/',
         minibio: 'Software Engineer'
