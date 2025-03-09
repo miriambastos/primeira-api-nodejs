@@ -1,107 +1,103 @@
 const express = require("express")
 const router = express.Router()
 
-//nmp UUID para gerar ID automatico
-const { v4: uuidv4 } = require('uuid');
-
 const conectaBancoDeDados = require('./bancoDeDados') //ligando ao arquivo BD
 conectaBancoDeDados()
+
+const Mulher = require('./womanModel')
 
 const app = express()
 app.use(express.json()) //tratando as requisições e os dados que vao trafegar estarão em json
 const porta = 3333
 
 
-
-const mulheres = 
-[
-    {
-        id: '1',
-        nome: 'Thamires Gomes',
-        imagem: 'https://www.linkedin.com/in/thamires-gomes-silva-99755aa5/overlay/photo/',
-        minibio: 'Engineer Lead'
-    },
-    {
-        id: '2',
-        nome: 'Duda Cavalcante',
-        imagem: 'https://www.linkedin.com/in/maria-eduarda-goncalves-cavalcante/overlay/photo/',
-        minibio: 'Product Owner'
-    },
-    {
-        id: '3',
-        nome: 'Poli Piva',
-        imagem: 'https://www.linkedin.com/in/poliana-piva/overlay/photo/',
-        minibio: 'Software Engineer'
-    }
-
-]
-
 //GET
-function mostrarMulheres(request, response)
+async function mostrarMulheres(request, response)
 {
-    response.json(mulheres)
+    try 
+    {
+        const mulheresVindasDoBancoDeDados = await Mulher.find()
+        response.json(mulheresVindasDoBancoDeDados)
+    }
+    catch (erro)
+    {
+        console.log(erro)
+    }
 }
 
+
 //POST
-function criarMulher(request, response)
+async function criarMulher(request, response)
 {
-    const novaMulher = 
+    const novaMulher = new Mulher(
     {
-        id: uuidv4(),
         nome: request.body.nome,
         imagem: request.body.imagem,
-        minibio: request.body.minibio
+        minibio: request.body.minibio,
+        citacao: request.body.citacao
+    })
+
+    try
+    {
+        const mulherCriada = await novaMulher.save()
+        response.status(201).json(mulherCriada)
     }
-
-    mulheres.push(novaMulher)
-
-    response.json(mulheres)
+    catch (erro)
+    {
+        console.log(erro)
+    }
 }
 
 //PATCH
-function corrigeMulher(request, response)
+async function corrigeMulher(request, response)
 {
-    function encontraMulher(mulher)
+    try
     {
-        if (mulher.id === request.params.id) //encontrar id igual ao que sera informado na requisição
-        {
-            return mulher
-        }
-    }
+        const mulherEncontrada = await Mulher.findById(request.params.id)
 
-    const mulherEncontrada = mulheres.find(encontraMulher)
+        if (request.body.nome)
+            {
+                mulherEncontrada.nome = request.body.nome
+            }
+        
+            if (request.body.minibio)
+            {
+                mulherEncontrada.minibio = request.body.minibio
+            }
+        
+            if (request.body.imagem)
+            {
+                mulherEncontrada = request.body.imagem
+            }
 
-    if (request.body.nome)
+            if (request.body.citacao)
+            {
+                mulherEncontrada = request.body.citacao
+            }
+
+            const mulherAtualizadaNoBancoDeDados = await mulherEncontrada.save()
+
+            response.json(mulherAtualizadaNoBancoDeDados)
+    } 
+    catch (erro)
     {
-        mulherEncontrada.nome = request.body.nome
+        console.log(erro)
     }
-
-    if (request.body.minibio)
-    {
-        mulherEncontrada.minibio = request.body.minibio
-    }
-
-    if (request.body.imagem)
-    {
-            mulherEncontrada = request.body.imagem
-    }
-
-
-    response.json(mulheres)
 }
 
 //DELETE
-function deletarMulher(request, response)
+async function deletarMulher(request, response)
 {
-    function todasMenosEla(mulher)
+    try
     {
-        if (mulher.id !== request.params.id)
-            return mulher
+        await Mulher.findByIdAndDelete(request.params.id)
+        response.json({menssagem: 'Mulher excluida com sucesso'})
     }
 
-    const mulheresQueFicam = mulheres.filter(todasMenosEla)
-
-    response.json(mulheresQueFicam)
+    catch (erro)
+    {
+        consol.log(erro)
+    }
 }
 
 app.use(router.get('/womans', mostrarMulheres)) 
