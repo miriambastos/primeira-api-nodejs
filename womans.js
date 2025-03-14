@@ -1,5 +1,6 @@
 const express = require("express")
 const router = express.Router()
+const cors = require('cors') //consome api no front
 
 const conectaBancoDeDados = require('./bancoDeDados') //ligando ao arquivo BD
 conectaBancoDeDados()
@@ -8,6 +9,8 @@ const Mulher = require('./womanModel')
 
 const app = express()
 app.use(express.json()) //tratando as requisições e os dados que vao trafegar estarão em json
+app.use(cors())
+
 const porta = 3333
 
 
@@ -67,12 +70,12 @@ async function corrigeMulher(request, response)
         
             if (request.body.imagem)
             {
-                mulherEncontrada = request.body.imagem
+                mulherEncontrada.imagem = request.body.imagem
             }
 
             if (request.body.citacao)
             {
-                mulherEncontrada = request.body.citacao
+                mulherEncontrada.citacao = request.body.citacao
             }
 
             const mulherAtualizadaNoBancoDeDados = await mulherEncontrada.save()
